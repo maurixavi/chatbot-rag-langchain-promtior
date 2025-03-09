@@ -1,0 +1,19 @@
+
+venv/
+.env
+
+__pycache__
+
+.streamlit/
+chat_histories/
+
+# Local configuration files
+*.local
+
+# IDE files
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.log
