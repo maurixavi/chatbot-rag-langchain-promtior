@@ -1,9 +1,17 @@
-from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader #requires bsoup
+from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from settings import DEFAULT_URLS, DEFAULT_PDFS # data sources
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+
+huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+
 
 # -------------------------------------------------
 # Helper functions for handling document ingestion, splitting, and vector store creation
@@ -73,7 +81,7 @@ def split_documents(documents):
   
 
 ### STORE ###
-def get_vector_store(documents_chunks):
+def get_vector_store_BACKUP(documents_chunks):
     """
     Create a FAISS vector store from document chunks.
 
@@ -90,4 +98,24 @@ def get_vector_store(documents_chunks):
     # Save vector store locally (optional)
     vector_store.save_local("faiss_index")
     
+    return vector_store
+
+
+def get_vector_store(documents_chunks):
+    """
+    Create a FAISS vector store from document chunks.
+    """
+    model = "sentence-transformers/all-MiniLM-L6-v2" 
+
+    embeddings = HuggingFaceEndpointEmbeddings(
+        model=model,
+        task="feature-extraction",
+        huggingfacehub_api_token=huggingfacehub_api_token,
+    )
+
+    # Crear el vector store con FAISS
+    vector_store = FAISS.from_documents(documents_chunks, embeddings)
+
+    vector_store.save_local("faiss_index")
+
     return vector_store

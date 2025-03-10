@@ -1,6 +1,7 @@
 streamlit
 dotenv
 fastapi
+uvicorn
 langserve
 langchain_groq
 langchain
